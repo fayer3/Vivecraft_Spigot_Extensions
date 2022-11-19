@@ -53,7 +53,6 @@ import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
 import org.vivecraft.utils.MetadataHelper;
 
-import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
