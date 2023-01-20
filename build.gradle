@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.vivecraft'
-version '1.0'
+version '1.19.1-2b'
 
 repositories {
     mavenCentral()
@@ -35,6 +35,30 @@ dependencies {
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
 }
 
+jar.finalizedBy remap
+
 test {
     useJUnitPlatform()
+}
+tasks {
+    remap {
+        //Overrides the Minecraft version to remap against.
+        //You may use this option if your version can't automatically be detected.
+        //Must match a valid Spigot dependency version.
+        version.set("1.19.1-R0.1-SNAPSHOT")
+
+        //Overrides the default input file
+        //inputFile.set(uberJar.archiveFile)
+
+        //The classifier to add to the end of the output file
+        //(if archiveName is not specified)
+        //archiveClassifier.set("remapped")
+
+        //The name to use for the output file
+        //(if outputFile is not specified)
+        //archiveName.set("plugin-remapped.jar")
+
+        //The archive file to write to
+        //outputFile.set(File(buildDir, "Vivecraft_Spigot_Extensions.jar"))
+    }
 }
