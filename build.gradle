@@ -1,0 +1,64 @@
+plugins {
+    id 'java'
+    id "me.tagavari.nmsremap" version "1.0.0"
+}
+
+group 'org.vivecraft'
+version '1.20.1-1'
+
+repositories {
+    mavenCentral()
+    mavenLocal {
+        content {
+            // this repository *only* contains artifacts with group
+            includeGroup "org.spigotmc"
+            includeGroup "org.bukkit"
+            includeGroup "com.mojang"
+        }
+    }
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://oss.sonatype.org/content/repositories/central' }
+    maven {url 'https://jitpack.io'}
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    compileOnly 'org.spigotmc:spigot:1.20.1-R0.1-SNAPSHOT:remapped-mojang'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
+}
+
+jar.finalizedBy remap
+
+test {
+    useJUnitPlatform()
+}
+tasks {
+    remap {
+        //Overrides the Minecraft version to remap against.
+        //You may use this option if your version can't automatically be detected.
+        //Must match a valid Spigot dependency version.
+        version.set("1.20.1-R0.1-SNAPSHOT")
+
+        //Overrides the default input file
+        //inputFile.set(uberJar.archiveFile)
+
+        //The classifier to add to the end of the output file
+        //(if archiveName is not specified)
+        //archiveClassifier.set("remapped")
+
+        //The name to use for the output file
+        //(if outputFile is not specified)
+        //archiveName.set("plugin-remapped.jar")
+
+        //The archive file to write to
+        //outputFile.set(File(buildDir, "Vivecraft_Spigot_Extensions.jar"))
+    }
+}
