@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.vivecraft'
-version '1.20.1-1'
+version providers.gradleProperty('plugin_version').get()
 
 repositories {
     mavenCentral()
@@ -31,7 +31,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    compileOnly 'org.spigotmc:spigot:1.20.1-R0.1-SNAPSHOT:remapped-mojang'
+    compileOnly 'org.spigotmc:spigot:' + providers.gradleProperty('spigot_version').get() + ':remapped-mojang'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
 }
 
@@ -40,12 +40,22 @@ jar.finalizedBy remap
 test {
     useJUnitPlatform()
 }
+
+processResources {
+    filesMatching('plugin.yml') {
+        expand (
+                "version": providers.gradleProperty('plugin_version').get(),
+                "api_version": providers.gradleProperty('spigot_api_version').get()
+        )
+    }
+}
+
 tasks {
     remap {
         //Overrides the Minecraft version to remap against.
         //You may use this option if your version can't automatically be detected.
         //Must match a valid Spigot dependency version.
-        version.set("1.20.1-R0.1-SNAPSHOT")
+        version.set(providers.gradleProperty('spigot_version').get())
 
         //Overrides the default input file
         //inputFile.set(uberJar.archiveFile)
