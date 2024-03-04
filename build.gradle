@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    // to automatically remap the final jar
     id "me.tagavari.nmsremap" version "1.0.0"
 }
 
@@ -25,7 +26,7 @@ repositories {
     }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://oss.sonatype.org/content/repositories/central' }
-    maven {url 'https://jitpack.io'}
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -43,9 +44,9 @@ test {
 
 processResources {
     filesMatching('plugin.yml') {
-        expand (
-                "version": providers.gradleProperty('plugin_version').get(),
-                "api_version": providers.gradleProperty('spigot_api_version').get()
+        expand(
+            "version": providers.gradleProperty('plugin_version').get(),
+            "api_version": providers.gradleProperty('spigot_api_version').get()
         )
     }
 }
@@ -70,5 +71,44 @@ tasks {
 
         //The archive file to write to
         //outputFile.set(File(buildDir, "Vivecraft_Spigot_Extensions.jar"))
+    }
+}
+
+
+// Automatically execute the setupTask when Gradle loads the project
+tasks.register("runBuildtools", JavaExec) {
+
+    // check if we need to build the spigot jar
+    def file = new File(System.getProperty("user.home") +
+        '/.m2/repository/org/spigotmc/spigot/' +
+        providers.gradleProperty('spigot_version').get() +
+        '/spigot-' +
+        providers.gradleProperty('spigot_version').get() +
+        '-remapped-mojang.jar')
+
+    if (!file.exists()) {
+        println "didn't find correct spigot version, building:"
+
+        // download buildtools
+        def buildtools = new File(project.projectDir.toString() + '/.gradle/buildtools/BuildTools.jar')
+
+        def buildDir = project.projectDir.toString() + '/.gradle/buildtools'
+
+        workingDir = buildDir
+
+        buildtools.parentFile.mkdirs()
+        if (!buildtools.exists()) {
+            new URL('https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar').withInputStream { i -> buildtools.withOutputStream { it << i } }
+        }
+        mainClass = "org.spigotmc.builder.Bootstrap"
+        classpath = files(buildtools.absolutePath)
+        args = ["-rev", providers.gradleProperty('mc_version').get(), "--remapped"]
+    }
+    onlyIf { !file.exists() }
+}
+
+tasks.configureEach { task ->
+    if (task.name != "runBuildtools") {
+        task.dependsOn runBuildtools
     }
 }
