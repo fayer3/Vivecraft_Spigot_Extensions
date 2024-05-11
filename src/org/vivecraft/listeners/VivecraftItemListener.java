@@ -31,7 +31,7 @@ public class VivecraftItemListener implements Listener{
 		 
 		 float f2 = 0.3F;
 		 
-		 if(event.getItemDrop().getType() == EntityType.DROPPED_ITEM){
+		 if(event.getItemDrop().getType() == EntityType.ITEM){
 		 	 Vector v = new Vector();
 			 float yaw = player.getLocation().getYaw();
 			 float pitch = -player.getLocation().getPitch();
