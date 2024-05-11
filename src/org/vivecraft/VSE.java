@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -35,6 +36,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -91,6 +93,7 @@ public class VSE extends JavaPlugin implements Listener {
 				ItemMeta meta = is.getItemMeta();
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+				((LeatherArmorMeta) meta).setColor(Color.fromRGB(9233775));
 				is.setItemMeta(meta);		
 				is = setLocalizedItemName(is,"vivecraft.item.jumpboots", "Jump Boots");
 				ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
