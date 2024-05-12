@@ -13,15 +13,16 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -35,6 +36,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -54,6 +56,7 @@ import org.vivecraft.utils.Headshot;
 import org.vivecraft.utils.MetadataHelper;
 
 import net.milkbowl.vault.permission.Permission;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
@@ -90,8 +93,9 @@ public class VSE extends JavaPlugin implements Listener {
 				ItemMeta meta = is.getItemMeta();
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-				is.setItemMeta(meta);
-				is = setLocalizedItemName(is, "vivecraft.item.jumpboots");
+				((LeatherArmorMeta) meta).setColor(Color.fromRGB(9233775));
+				is.setItemMeta(meta);		
+				is = setLocalizedItemName(is,"vivecraft.item.jumpboots", "Jump Boots");
 				ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
 				recipe.shape("B", "S");
 				recipe.setIngredient('B', Material.LEATHER_BOOTS);
@@ -104,7 +108,7 @@ public class VSE extends JavaPlugin implements Listener {
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 				is.setItemMeta(meta);
-				is = setLocalizedItemName(is, "vivecraft.item.climbclaws");
+				is = setLocalizedItemName(is, "vivecraft.item.climbclaws", "Climb Claws");
 				ShapedRecipe recipe = new ShapedRecipe( new NamespacedKey(this, "climb_claws"), is);
 				recipe.shape("E E", "S S");
 				recipe.setIngredient('E', Material.SPIDER_EYE);
@@ -198,9 +202,9 @@ public class VSE extends JavaPlugin implements Listener {
 		}, 1);
 	}
 
-	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
+	public static ItemStack setLocalizedItemName(ItemStack stack, String key, String fallback) {
 		var nmsStack = CraftItemStack.asNMSCopy(stack);
-		nmsStack.setHoverName(Component.translatable(key));
+		nmsStack.set(DataComponents.CUSTOM_NAME, Component.translatableWithFallback(key, fallback));
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
 
@@ -423,10 +427,13 @@ public class VSE extends JavaPlugin implements Listener {
 		if (g_classic != null && !g_classic.trim().isEmpty())
 			groups.put(g_classic, iscompanion);
 
-		if (isvive) {
-			String g_freemove = getConfig().getString("permissions.freemovegroup");
-			if (g_freemove != null && !g_freemove.trim().isEmpty())
+		String g_freemove = getConfig().getString("permissions.freemovegroup");
+		if (g_freemove != null && !g_freemove.trim().isEmpty()) {
+			if (isvive) {
 				groups.put(g_freemove, !vivePlayers.get(p.getUniqueId()).isTeleportMode);
+			} else {
+				groups.put(g_freemove, false);
+			}
 		}
 
 		updatePlayerPermissionGroup(p, groups);

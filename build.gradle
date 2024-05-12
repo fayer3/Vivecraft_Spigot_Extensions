@@ -7,6 +7,11 @@ plugins {
 group 'org.vivecraft'
 version providers.gradleProperty('plugin_version').get()
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.release = 21
+}
+
 repositories {
     mavenCentral()
     mavenLocal {
