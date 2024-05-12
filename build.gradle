@@ -1,3 +1,15 @@
+import java.nio.file.Files
+import java.nio.file.attribute.FileTime
+import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
+
+buildscript {
+    dependencies {
+        // needed for java 21
+        classpath 'net.md-5:SpecialSource:1.11.4'
+    }
+}
+
 plugins {
     id 'java'
     // to automatically remap the final jar
@@ -7,7 +19,7 @@ plugins {
 group 'org.vivecraft'
 version providers.gradleProperty('plugin_version').get()
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
     options.release = 21
 }
@@ -102,7 +114,12 @@ tasks.register("runBuildtools", JavaExec) {
         workingDir = buildDir
 
         buildtools.parentFile.mkdirs()
-        if (!buildtools.exists()) {
+
+        def timestampXML = new URL('https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/api/xml?tree=timestamp').text
+        def matcher = Pattern.compile("<timestamp>(\\d+?)</timestamp>").matcher(timestampXML)
+        matcher.find()
+        def newTime = Long.parseLong(matcher.group(1))
+        if (!buildtools.exists() || ((FileTime) Files.getAttribute(buildtools.toPath(), "creationTime")).to(TimeUnit.MILLISECONDS) < newTime) {
             new URL('https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar').withInputStream { i -> buildtools.withOutputStream { it << i } }
         }
         mainClass = "org.spigotmc.builder.Bootstrap"
