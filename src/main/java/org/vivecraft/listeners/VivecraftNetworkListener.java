@@ -24,11 +24,11 @@ import net.minecraft.world.entity.Pose;
 
 public class VivecraftNetworkListener implements PluginMessageListener {
 	public VSE vse;
-		
+
 	public VivecraftNetworkListener(VSE vse){
 		this.vse = vse;
 	}
-	
+
 	public enum PacketDiscriminators {
 		VERSION,
 		REQUESTDATA,
@@ -45,17 +45,17 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		HEIGHT,
 		ACTIVEHAND,
 		CRAWL,
-        NETWORK_VERSION,
-        VR_SWITCHING,
-        IS_VR_ACTIVE,
-        VR_PLAYER_STATE
+		NETWORK_VERSION,
+		VR_SWITCHING,
+		IS_VR_ACTIVE,
+		VR_PLAYER_STATE
 	}
-	
+
 	@Override
 	public void onPluginMessageReceived(String channel, Player sender, byte[] payload) {
-		
+
 		if(!channel.equalsIgnoreCase(VSE.CHANNEL)) return;
-		
+
 		if(payload.length==0) return;
 
 		VivePlayer vp = VSE.vivePlayers.get(sender.getUniqueId());
@@ -63,7 +63,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		PacketDiscriminators disc = PacketDiscriminators.values()[payload[0]];
 		if(vp == null && disc != PacketDiscriminators.VERSION) {
 			//how?
-			return;
+					return;
 		}
 
 		byte[] data = Arrays.copyOfRange(payload, 1, payload.length);
@@ -262,11 +262,14 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			try {
 				vr = vrd.readBoolean();
 				if(vp.isVR()==vr) break;
-				vp.setVR(vr);
-				VSE.me.setPermissionsGroup(sender);
-                if (!vr) {
-                	vse.sendVRActiveUpdate(vp);
-                }
+				if (!vr) {
+					vp.setVR(false);
+				} else {
+					vp.setVR(true);
+					PoseOverrider.injectPlayer(sender);
+				}
+				vse.sendVRActiveUpdate(vp);
+				vse.setPermissionsGroup(sender);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -292,7 +295,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			writeString(output, "");
 		}
 	}
-	
+
 	public static byte[] StringToPayload(PacketDiscriminators version, String input){
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
@@ -303,7 +306,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		}
 
 		return output.toByteArray();
-		
+
 	}
 
 	public static boolean writeString(ByteArrayOutputStream output, String str) {
@@ -319,22 +322,22 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 
 		return true;
 	}
-	
-    public static int varIntByteCount(int toCount)
-    {
-        return (toCount & 0xFFFFFF80) == 0 ? 1 : ((toCount & 0xFFFFC000) == 0 ? 2 : ((toCount & 0xFFE00000) == 0 ? 3 : ((toCount & 0xF0000000) == 0 ? 4 : 5)));
-    }
-	
-    public static boolean writeVarInt(ByteArrayOutputStream to, int toWrite, int maxSize)
-    {
-        if (varIntByteCount(toWrite) > maxSize) return false;
-        while ((toWrite & -128) != 0)
-        {
-            to.write(toWrite & 127 | 128);
-            toWrite >>>= 7;
-        }
 
-        to.write(toWrite);
-        return true;
-    }
+	public static int varIntByteCount(int toCount)
+	{
+		return (toCount & 0xFFFFFF80) == 0 ? 1 : ((toCount & 0xFFFFC000) == 0 ? 2 : ((toCount & 0xFFE00000) == 0 ? 3 : ((toCount & 0xF0000000) == 0 ? 4 : 5)));
+	}
+
+	public static boolean writeVarInt(ByteArrayOutputStream to, int toWrite, int maxSize)
+	{
+		if (varIntByteCount(toWrite) > maxSize) return false;
+		while ((toWrite & -128) != 0)
+		{
+			to.write(toWrite & 127 | 128);
+			toWrite >>>= 7;
+		}
+
+		to.write(toWrite);
+		return true;
+	}
 }
