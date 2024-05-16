@@ -1,6 +1,5 @@
 package org.vivecraft.utils;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.bukkit.craftbukkit.v1_20_R4.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.vivecraft.Reflector;
@@ -16,11 +15,12 @@ import net.minecraft.world.entity.Pose;
 public class PoseOverrider {
 	@SuppressWarnings("unchecked")
 	public static void injectPlayer(Player player) {
-		EntityDataAccessor<Pose> poseObj = (EntityDataAccessor<Pose>) Reflector.getFieldValue(Reflector.Entity_Data_Pose, player);
-		SynchedEntityData dataWatcher = ((CraftEntity) player).getHandle().getEntityData();
-		Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>> entries = (Int2ObjectOpenHashMap<DataItem<?>>) Reflector.getFieldValue(Reflector.SynchedEntityData_itemsById, dataWatcher);
-		InjectedDataWatcherItem item = new InjectedDataWatcherItem(poseObj, Pose.STANDING, player);
-		entries.put(poseObj.id(), item);
+			EntityDataAccessor<Pose> poseObj = (EntityDataAccessor<Pose>) Reflector.getFieldValue(Reflector.Entity_Data_Pose, player);
+			SynchedEntityData dataWatcher = ((CraftEntity) player).getHandle().getEntityData();
+			SynchedEntityData.DataItem<?>[] entries = (DataItem<?>[]) Reflector.getFieldValue(Reflector.SynchedEntityData_itemsById, dataWatcher);
+			InjectedDataWatcherItem item = new InjectedDataWatcherItem(poseObj, Pose.STANDING, player);
+			if(entries.length-1 >= poseObj.id())
+				entries[poseObj.id()] = item;		
 	}
 
 	public static class InjectedDataWatcherItem extends SynchedEntityData.DataItem<Pose> {
