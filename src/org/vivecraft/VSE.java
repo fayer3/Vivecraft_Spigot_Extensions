@@ -19,10 +19,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -149,7 +149,7 @@ public class VSE extends JavaPlugin implements Listener {
 			//make an attempt to validate these on the server for debugging.
 			if(temp != null){
 				for (String string : temp) {		
-					if (BuiltInRegistries.BLOCK.get(new ResourceLocation(string)) == null) {
+					if (BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(string)) == null) {
 						getLogger().warning("Unknown climbey block name: " + string);
 						continue;
 					}
