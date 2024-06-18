@@ -19,6 +19,10 @@ public class Reflector {
 	public static Field aboveGroundTickCount = getPrivateField("J", ServerGamePacketListenerImpl.class);	
 	public static Field connection = getPrivateField("e", ServerCommonPacketListenerImpl.class);		
 	
+	public static int enderManFreezePriority = 1;		
+	public static int enderManLookTargetPriority = 1;		
+
+	
 	public static Object getFieldValue(Field field, Object object) {
 		try
 		{
