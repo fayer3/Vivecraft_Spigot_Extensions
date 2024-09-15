@@ -19,10 +19,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -44,9 +44,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ConstructTabCompleter;
 import org.vivecraft.command.ViveCommand;
-import org.vivecraft.entities.CustomGoalStare;
+import org.vivecraft.entities.CustomEndermanFreezeWhenLookedAt;
+import org.vivecraft.entities.CustomEndermanLookForPlayerGoal;
 import org.vivecraft.entities.CustomGoalSwell;
-import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
@@ -149,7 +149,7 @@ public class VSE extends JavaPlugin implements Listener {
 			//make an attempt to validate these on the server for debugging.
 			if(temp != null){
 				for (String string : temp) {		
-					if (BuiltInRegistries.BLOCK.get(new ResourceLocation(string)) == null) {
+					if (BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(string)) == null) {
 						getLogger().warning("Unknown climbey block name: " + string);
 						continue;
 					}
@@ -241,21 +241,21 @@ public class VSE extends JavaPlugin implements Listener {
 			EnderMan e = ((CraftEnderman) entity).getHandle();
 			AbstractCollection<WrappedGoal> targets = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).targetSelector);
 			for(WrappedGoal b: targets){
-				if(b.getPriority() == 1){ //replace PlayerWhoLookedAt target. Class is private cant use instanceof, check priority on all new versions.
+				if(b.getPriority() == Reflector.enderManLookTargetPriority){ //replace PlayerWhoLookedAt target. Class is private cant use instanceof, check priority on all new versions.
 					targets.remove(b);
 					break;
 				}
 			}
-			e.targetSelector.addGoal(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e, e::isAngryAt));
+			e.targetSelector.addGoal(Reflector.enderManLookTargetPriority, new CustomEndermanLookForPlayerGoal(e, e::isAngryAt));
 
 			AbstractCollection<WrappedGoal> goals = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).goalSelector);
 			for(WrappedGoal b: goals){
-				if(b.getPriority()==1){//replace EndermanFreezeWhenLookedAt goal. Verify priority on new version.
+				if(b.getPriority()==Reflector.enderManFreezePriority){//replace EndermanFreezeWhenLookedAt goal. Verify priority on new version.
 					goals.remove(b);
 					break;
 				}
 			}
-			e.goalSelector.addGoal(1, new CustomGoalStare(e));
+			e.goalSelector.addGoal(Reflector.enderManFreezePriority, new CustomEndermanFreezeWhenLookedAt(e));
 		}
 	}
 

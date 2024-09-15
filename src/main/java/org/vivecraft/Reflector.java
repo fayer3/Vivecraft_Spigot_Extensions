@@ -9,19 +9,19 @@ import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
-import net.minecraft.world.entity.monster.EnderMan;
 
 public class Reflector {
-	//last checked 1.20.6
+	//last checked 1.21
 	public static Field Entity_Data_Pose= getPrivateField("at", Entity.class);
-	public static Field Entity_eyeHeight = getPrivateField("bg", Entity.class);
+	public static Field Entity_eyeHeight = getPrivateField("be", Entity.class);
 	public static Field SynchedEntityData_itemsById = getPrivateField("e", SynchedEntityData.class);
 	public static Field availableGoals = getPrivateField("c", GoalSelector.class);	
-	public static Field aboveGroundTickCount = getPrivateField("J", ServerGamePacketListenerImpl.class);
-	public static Field connection = getPrivateField("e", ServerCommonPacketListenerImpl.class);	
-	//public now!
-	//public static Method Entity_teleport= getPrivateMethod("A", EnderMan.class);
-	public static Method Entity_teleportTowards = getPrivateMethod("b", EnderMan.class, Entity.class);
+	public static Field aboveGroundTickCount = getPrivateField("J", ServerGamePacketListenerImpl.class);	
+	public static Field connection = getPrivateField("e", ServerCommonPacketListenerImpl.class);		
+	
+	public static int enderManFreezePriority = 1;		
+	public static int enderManLookTargetPriority = 1;		
+
 	
 	public static Object getFieldValue(Field field, Object object) {
 		try
