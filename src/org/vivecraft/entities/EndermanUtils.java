@@ -31,19 +31,21 @@ public class EndermanUtils {
 			boolean vr = pPlayer instanceof Player && VSE.isVive((org.bukkit.entity.Player) pPlayer.getBukkitEntity());
 			VivePlayer vp = null;
 			Vec3 hmdpos = null;
+			double f=0.025;
 			if(vr){
 				vp = VSE.vivePlayers.get(pPlayer.getBukkitEntity().getUniqueId());
 				vec3 = vp.getHMDDir();
 				Location h = vp.getHMDPos();
 				hmdpos = new Vec3(h.getX(), h.getY(), h.getZ());
 				vec31= new Vec3(enderman.getX() - hmdpos.x, enderman.getEyeY() - hmdpos.y, enderman.getZ() - hmdpos.z);
+				f=0.1;
 			}
 			////
 			double d0 = vec31.length();
 			vec31 = vec31.normalize();
 			double d1 = vec3.dot(vec31);
 			//VSE MODIFICATION
-			if(! (d1 > 1.0D - 0.025D / d0)) return false; 			
+			if(!(d1 > 1.0D - f / d0)) return false; 			
 			if(vr)
 				return hasLineOfSight(hmdpos, enderman);
 			else
