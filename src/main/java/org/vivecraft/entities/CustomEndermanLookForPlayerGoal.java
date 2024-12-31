@@ -18,17 +18,17 @@ public class CustomEndermanLookForPlayerGoal extends NearestAttackableTargetGoal
 	private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
 	private final Predicate<LivingEntity> isAngerInducing;
 
-	public CustomEndermanLookForPlayerGoal(EnderMan entityenderman, Predicate<LivingEntity> p) {
-		super(entityenderman, Player.class, 10, false, false, p);
+	public CustomEndermanLookForPlayerGoal(EnderMan entityenderman, TargetingConditions.Selector selector) {
+		super(entityenderman, Player.class, 10, false, false, selector);
 		this.enderman = entityenderman;
 		this.isAngerInducing = (entityliving) -> {
-			return (EndermanUtils.isLookingAtMe((Player)entityliving, this.enderman) || entityenderman.isAngryAt((LivingEntity) entityliving)) && !entityenderman.hasIndirectPassenger((Entity) entityliving);
+			return (EndermanUtils.isLookingAtMe((Player)entityliving, this.enderman) || entityenderman.isAngryAt((LivingEntity) entityliving, getServerLevel(entityliving))) && !entityenderman.hasIndirectPassenger(entityliving);
 		};
-		this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(this.isAngerInducing);
+		this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(selector);
 	}
 
 	public boolean canUse() {
-		this.pendingTarget = this.enderman.level().getNearestPlayer(this.startAggroTargetConditions, this.enderman);
+		this.pendingTarget = getServerLevel(this.enderman).getNearestPlayer(startAggroTargetConditions, enderman, enderman.getX(), enderman.getEyeY(), enderman.getZ());
 		return this.pendingTarget != null;
 	}
 
@@ -57,7 +57,7 @@ public class CustomEndermanLookForPlayerGoal extends NearestAttackableTargetGoal
 					return false;
 				}
 
-				if (this.continueAggroTargetConditions.test(this.enderman, this.target)) {
+				if (this.continueAggroTargetConditions.test(getServerLevel(enderman), this.enderman, this.target)) {
 					return true;
 				}
 			}
