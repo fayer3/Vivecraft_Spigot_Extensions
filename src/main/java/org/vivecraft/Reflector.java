@@ -11,9 +11,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 
 public class Reflector {
-	//last checked 1.21
-	public static Field Entity_Data_Pose= getPrivateField("at", Entity.class);
-	public static Field Entity_eyeHeight = getPrivateField("be", Entity.class);
+	//last checked 1.21.4
+	public static Field Entity_Data_Pose= getPrivateField("aq", Entity.class);
+	public static Field Entity_eyeHeight = getPrivateField("bc", Entity.class);
 	public static Field SynchedEntityData_itemsById = getPrivateField("e", SynchedEntityData.class);
 	public static Field availableGoals = getPrivateField("c", GoalSelector.class);	
 	public static Field aboveGroundTickCount = getPrivateField("J", ServerGamePacketListenerImpl.class);	
